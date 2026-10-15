@@ -14,6 +14,12 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$ROOT/.build/release/LocalFlow" "$APP/Contents/MacOS/LocalFlow"
 
+ICONSET="$ROOT/build/AppIcon.iconset"
+rm -rf "$ICONSET"
+swift "$ROOT/scripts/make-icon.swift" "$ICONSET"
+iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/AppIcon.icns"
+rm -rf "$ICONSET"
+
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -23,6 +29,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleName</key><string>LocalFlow</string>
   <key>CFBundleDisplayName</key><string>LocalFlow</string>
   <key>CFBundleExecutable</key><string>LocalFlow</string>
+  <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>0.1.0</string>
   <key>CFBundleVersion</key><string>1</string>
@@ -43,3 +50,11 @@ codesign --force --options runtime --sign "$IDENTITY" \
 </dict></plist>
 ENT
 echo "Built $APP"
+
+# INSTALL=1 copies the app into /Applications so it shows up in Launchpad/Spotlight.
+if [ "${INSTALL:-0}" = "1" ]; then
+  pkill -x LocalFlow 2>/dev/null || true
+  rm -rf /Applications/LocalFlow.app
+  cp -R "$APP" /Applications/LocalFlow.app
+  echo "Installed /Applications/LocalFlow.app"
+fi

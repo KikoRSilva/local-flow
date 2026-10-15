@@ -24,7 +24,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let controller = DictationController()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.setActivationPolicy(.accessory)
+        applyDockPolicy(controller.settings)
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         let menu = NSMenu()
         menu.delegate = self
@@ -84,6 +84,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(ActionItem("Sounds", checked: settings.sounds) { [weak self] in
             self?.apply(settings.with(\.sounds, !settings.sounds))
         })
+        menu.addItem(ActionItem("Show Dock Icon", checked: settings.showDockIcon) { [weak self] in
+            self?.apply(settings.with(\.showDockIcon, !settings.showDockIcon))
+        })
         menu.addItem(.separator())
 
         menu.addItem(ActionItem("Paste Last Transcript", enabled: controller.lastTranscript != nil) { [weak self] in
@@ -106,6 +109,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func apply(_ settings: Settings) {
         controller.update(settings)
+        applyDockPolicy(settings)
+    }
+
+    private func applyDockPolicy(_ settings: Settings) {
+        let policy: NSApplication.ActivationPolicy = settings.showDockIcon ? .regular : .accessory
+        if NSApp.activationPolicy() != policy { NSApp.setActivationPolicy(policy) }
     }
 
     private func disabled(_ title: String) -> NSMenuItem {

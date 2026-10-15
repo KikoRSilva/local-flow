@@ -7,6 +7,7 @@ Fully-local push-to-talk dictation for macOS 26: whisper.cpp on Metal for transc
 ```sh
 ./scripts/bundle.sh          # builds whisper.cpp (first run) + LocalFlow.app into build/
 open build/LocalFlow.app
+INSTALL=1 ./scripts/bundle.sh   # same, plus copies the app to /Applications (Launchpad, Spotlight)
 ```
 
 Grant **Microphone**, **Accessibility** and **Input Monitoring** when asked (System Settings → Privacy & Security). Ad-hoc signed builds must be re-granted after each rebuild; set `SIGN_IDENTITY="Apple Development: …"` to avoid that.

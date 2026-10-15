@@ -5,7 +5,15 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP="$ROOT/build/LocalFlow.app"
-IDENTITY="${SIGN_IDENTITY:--}"
+DEV_IDENTITY="LocalFlow Dev"
+if [ -n "${SIGN_IDENTITY:-}" ]; then
+  IDENTITY="$SIGN_IDENTITY"
+elif security find-identity -p codesigning | grep -q "\"$DEV_IDENTITY\""; then
+  IDENTITY="$DEV_IDENTITY"
+else
+  IDENTITY="-"
+fi
+echo "Signing with: $IDENTITY"
 
 [ -f "$ROOT/vendor/whisper/lib/libwhisper.a" ] || "$ROOT/scripts/build-whisper.sh"
 swift build -c release --package-path "$ROOT"

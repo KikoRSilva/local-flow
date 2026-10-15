@@ -29,6 +29,18 @@ final class WhisperEngine: @unchecked Sendable {
         if let context { whisper_free(context) }
     }
 
+    /// Frees the context (and its Metal buffers) synchronously, waiting for any in-flight
+    /// work. Must run before `exit()`: ggml's static Metal device destructor aborts if
+    /// buffers are still alive.
+    func shutdown() {
+        queue.sync {
+            if let context {
+                whisper_free(context)
+                self.context = nil
+            }
+        }
+    }
+
     func load(modelPath: String) async throws {
         try await run {
             if let old = self.context {

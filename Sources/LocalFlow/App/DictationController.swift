@@ -60,6 +60,10 @@ final class DictationController {
         Task { await warmUpCleanup() }
     }
 
+    func shutdown() {
+        whisper.shutdown()
+    }
+
     func update(_ newSettings: Settings) {
         let previous = settings
         settings = newSettings

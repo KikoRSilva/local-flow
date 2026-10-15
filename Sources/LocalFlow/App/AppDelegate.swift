@@ -36,6 +36,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         controller.boot()
     }
 
+    func applicationWillTerminate(_ notification: Notification) {
+        controller.shutdown()
+    }
+
     private func refreshIcon() {
         let symbol = controller.status == .ready ? "waveform" : "waveform.badge.exclamationmark"
         statusItem?.button?.image = NSImage(systemSymbolName: symbol, accessibilityDescription: "LocalFlow")
